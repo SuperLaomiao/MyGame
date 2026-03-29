@@ -69,8 +69,8 @@
             border: 3px solid #ffcc00;
             border-radius: 5px;
             position: relative;
-            width: 560px;
-            height: 448px;
+            width: 448px;
+            height: 490px;
             overflow: hidden;
         }
 
@@ -139,6 +139,41 @@
         .ghost-blue { background-color: #0000ff; }
         .ghost-pink { background-color: #ff00ff; }
         .ghost-orange { background-color: #ffaa00; }
+
+        .cage {
+            position: absolute;
+            width: 84px;
+            height: 84px;
+            background-color: #000;
+            border: 2px solid #4444ff;
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            z-index: 11;
+        }
+
+        .cage-door {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background-color: #0000ff;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12;
+        }
+
+        .cage-ghost {
+            width: 15px;
+            height: 15px;
+            border-radius: 50% 50% 0 0;
+        }
 
         .game-controls {
             display: flex;
@@ -211,7 +246,11 @@
             </div>
         </div>
 
-        <div class="game-board" id="gameBoard"></div>
+        <div class="game-board" id="gameBoard">
+            <div class="cage" id="cage">
+                <div class="cage-door" id="cageDoor"></div>
+            </div>
+        </div>
 
         <div class="game-controls">
             <div class="controls-info">
@@ -234,8 +273,8 @@
     <script>
         // 吃豆人游戏实现
         const GRID_SIZE = 28;
-        const ROWS = 16;
-        const COLS = 20;
+        const ROWS = 17;
+        const COLS = 16;
 
         const DIRECTIONS = {
             up: { x: 0, y: -1 },
@@ -246,21 +285,23 @@
 
         const LEVELS = [
             [
-                "WWWWWWWWWWWWWWWWWWWW",
-                "W........WW........W",
-                "W.WW.WWWW.WWW.WW..WW",
-                "W........W...W.....W",
-                "W.WW.WWW.W.WW.WW.WWW",
-                "W.....W............W",
-                "W.WWW.WWWWWWWWW.WW.W",
-                "W........W.....W...W",
-                "W.WWW.WWW.WWW.WWW.WW",
-                "W........W.....W...W",
-                "W.WW.WWW.W.WW.WW.WWW",
-                "W.....W.W.....W...W",
-                "W.WW.WWW.W.WW.WW.WWW",
-                "W........WW........W",
-                "WWWWWWWWWWWWWWWWWWWW"
+                "WWWWWWWWWWWWWWWW",
+                "W............WW",
+                "W.WWWWW.WWWWW.WW",
+                "W..W....W....W.W",
+                "W.WWW.W.WWW.W.WW",
+                "W............W.W",
+                "W.WWWWWWWWW.W.WW",
+                "W.............W",
+                "WWWWWWWWWWWWWWWW",
+                "W.............W",
+                "W.WWWWWWWWW.W.WW",
+                "W............W.W",
+                "W.WWW.W.WWW.W.WW",
+                "W..W....W....W.W",
+                "W.WWWWW.WWWWW.WW",
+                "W............W",
+                "WWWWWWWWWWWWWWWW"
             ]
         ];
 
@@ -291,6 +332,16 @@
         function initGame() {
             // 清除游戏板
             gameBoardElement.innerHTML = '';
+            // 重新添加笼子
+            const cage = document.createElement('div');
+            cage.className = 'cage';
+            cage.id = 'cage';
+            const cageDoor = document.createElement('div');
+            cageDoor.className = 'cage-door';
+            cageDoor.id = 'cageDoor';
+            cage.appendChild(cageDoor);
+            gameBoardElement.appendChild(cage);
+            
             gameBoard = [];
             pacman = null;
             ghosts = [];
@@ -348,12 +399,12 @@
                 createPacman(1, 1);
             }
             
-            // 放置幽灵
+            // 放置幽灵在笼子里
             const ghostPositions = [
-                [COLS - 2, 1],
-                [COLS - 2, ROWS - 2],
-                [1, ROWS - 2],
-                [Math.floor(COLS / 2), Math.floor(ROWS / 2)]
+                [7, ROWS - 1],
+                [8, ROWS - 1],
+                [7, ROWS - 2],
+                [8, ROWS - 2]
             ];
             
             for (let i = 0; i < ghostPositions.length; i++) {
@@ -362,6 +413,20 @@
                     createGhost(x, y);
                 }
             }
+            
+            // 放置能量豆
+            const powerPelletPositions = [
+                [1, 1],
+                [14, 1],
+                [1, 14],
+                [14, 14]
+            ];
+            
+            powerPelletPositions.forEach(([x, y]) => {
+                if (!cellAt(x, y)) {
+                    createPowerPellet(x, y);
+                }
+            });
         }
 
         // 创建墙壁
@@ -552,10 +617,10 @@
                 
                 ghosts.forEach((ghost, index) => {
                     const ghostPositions = [
-                        [COLS - 2, 1],
-                        [COLS - 2, ROWS - 2],
-                        [1, ROWS - 2],
-                        [Math.floor(COLS / 2), Math.floor(ROWS / 2)]
+                        [7, ROWS - 1],
+                        [8, ROWS - 1],
+                        [7, ROWS - 2],
+                        [8, ROWS - 2]
                     ];
                     const [x, y] = ghostPositions[index % ghostPositions.length];
                     ghost.x = x;

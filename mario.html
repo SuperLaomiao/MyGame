@@ -13,7 +13,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #5c94fc;
+            background-color: #87CEEB;
             color: white;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -23,14 +23,14 @@
         .game-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 20px;
         }
 
         .game-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7);
             padding: 10px 20px;
             border-radius: 5px;
         }
@@ -41,19 +41,19 @@
         }
 
         .game-board {
-            background-color: #90ee90;
+            background-color: #90EE90;
             border: 3px solid #8B4513;
             border-radius: 5px;
             position: relative;
-            width: 400px;
-            height: 300px;
+            width: 640px;
+            height: 360px;
             overflow: hidden;
         }
 
         .player {
             position: absolute;
             width: 30px;
-            height: 30px;
+            height: 40px;
             background-color: #FF6B6B;
             bottom: 0;
             left: 50px;
@@ -145,7 +145,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.9);
             padding: 30px;
             border-radius: 10px;
             text-align: center;
@@ -199,11 +199,10 @@
     <script>
         // 超级马里奥游戏实现
         const PLAYER_SPEED = 2;
-        const JUMP_POWER = 15;
+        const JUMP_STRENGTH = -12;
         const GRAVITY = 0.5;
 
         let gameRunning = false;
-        let gamePaused = false;
         let score = 0;
         let lives = 3;
         let animationId;
@@ -263,7 +262,6 @@
             createFlag();
             
             gameRunning = true;
-            gamePaused = false;
             startBtn.textContent = '游戏中';
             startBtn.disabled = true;
             gameOverElement.classList.add('hidden');
@@ -377,34 +375,10 @@
             gameBoard.appendChild(flag);
         }
 
-        // 游戏主循环
-        function gameLoop() {
-            if (gameRunning && !gamePaused) {
-                update();
-                render();
-                animationId = requestAnimationFrame(gameLoop);
-            }
-        }
-
         // 更新游戏状态
-        function update() {
-            // 更新玩家
-            updatePlayer();
-            
-            // 更新敌人
-            updateEnemies();
-            
-            // 检查碰撞
-            checkCollisions();
-            
-            // 检查是否到达旗帜
-            if (playerState.x > gameBoard.offsetWidth - 100) {
-                gameOver();
-            }
-        }
+        function updateGameState() {
+            if (!gameRunning) return;
 
-        // 更新玩家
-        function updatePlayer() {
             // 应用重力
             playerState.velocityY += GRAVITY;
             
@@ -435,10 +409,10 @@
                 if (playerState.x < platformRight && 
                     playerState.x + 30 > platformLeft && 
                     playerState.y < platformBottom && 
-                    playerState.y + 30 > platformTop) {
+                    playerState.y + 40 > platformTop) {
                     // 如果玩家在向下移动
                     if (playerState.velocityY > 0) {
-                        playerState.y = platformTop - 30;
+                        playerState.y = platformTop - 40;
                         playerState.velocityY = 0;
                         playerState.onGround = true;
                     }
@@ -449,27 +423,12 @@
             if (playerState.y > gameBoard.offsetHeight) {
                 loseLife();
             }
-        }
-
-        // 更新敌人
-        function updateEnemies() {
-            enemies.forEach(enemy => {
-                // 敌人简单的左右移动
-                const rect = enemy.getBoundingClientRect();
-                const boardRect = gameBoard.getBoundingClientRect();
-                const enemyLeft = rect.left - boardRect.left;
-                
-                if (enemyLeft > 300 || enemyLeft < 250) {
-                    enemy.style.left = (300 - (enemyLeft - 250)) + 'px';
-                } else {
-                    enemy.style.left = (parseInt(enemy.style.left) || 250) + (Math.random() > 0.5 ? 1 : -1) + 'px';
-                }
-            });
-        }
-
-        // 检查碰撞
-        function checkCollisions() {
-            // 硬币碰撞
+            
+            // 更新玩家位置
+            player.style.left = playerState.x + 'px';
+            player.style.bottom = playerState.y + 'px';
+            
+            // 检查硬币碰撞
             coins.forEach((coin, index) => {
                 const rect = coin.getBoundingClientRect();
                 const boardRect = gameBoard.getBoundingClientRect();
@@ -482,8 +441,7 @@
                 if (playerState.x < coinRight && 
                     playerState.x + 30 > coinLeft && 
                     playerState.y < coinBottom && 
-                    playerState.y + 30 > coinTop) {
-                    // 收集硬币
+                    playerState.y + 40 > coinTop) {
                     score += 10;
                     scoreElement.textContent = score;
                     coin.remove();
@@ -491,7 +449,7 @@
                 }
             });
             
-            // 敌人碰撞
+            // 检查敌人碰撞
             enemies.forEach((enemy, index) => {
                 const rect = enemy.getBoundingClientRect();
                 const boardRect = gameBoard.getBoundingClientRect();
@@ -504,21 +462,54 @@
                 if (playerState.x < enemyRight && 
                     playerState.x + 30 > enemyLeft && 
                     playerState.y < enemyBottom && 
-                    playerState.y + 30 > enemyTop) {
-                    // 如果玩家在跳跃
-                    if (playerState.velocityY > 0) {
-                        // 消灭敌人
-                        enemy.remove();
-                        enemies.splice(index, 1);
-                        playerState.velocityY = -5; // 反弹
-                        score += 50;
-                        scoreElement.textContent = score;
-                    } else {
-                        // 失去生命
-                        loseLife();
-                    }
+                    playerState.y + 40 > enemyTop) {
+                    loseLife();
                 }
             });
+            
+            // 检查是否到达旗帜
+            const flag = document.querySelector('.flag');
+            if (flag) {
+                const rect = flag.getBoundingClientRect();
+                const boardRect = gameBoard.getBoundingClientRect();
+                
+                const flagLeft = rect.left - boardRect.left;
+                const flagRight = rect.right - boardRect.left;
+                const flagTop = boardRect.height - (rect.bottom - boardRect.top);
+                const flagBottom = boardRect.height - (rect.top - boardRect.top);
+                
+                if (playerState.x < flagRight && 
+                    playerState.x + 30 > flagLeft && 
+                    playerState.y < flagBottom && 
+                    playerState.y + 40 > flagTop) {
+                    gameOver();
+                }
+            }
+        }
+
+        // 移动玩家
+        function movePlayer(direction) {
+            if (!gameRunning) return;
+            
+            switch (direction) {
+                case 'left':
+                    playerState.velocityX = -PLAYER_SPEED;
+                    break;
+                case 'right':
+                    playerState.velocityX = PLAYER_SPEED;
+                    break;
+                case 'up':
+                    if (playerState.onGround) {
+                        playerState.velocityY = JUMP_STRENGTH;
+                        playerState.onGround = false;
+                    }
+                    break;
+            }
+        }
+
+        // 停止移动
+        function stopPlayer() {
+            playerState.velocityX = 0;
         }
 
         // 失去生命
@@ -529,14 +520,22 @@
             if (lives <= 0) {
                 gameOver();
             } else {
-                // 重置玩家位置
-                playerState = {
-                    x: 50,
-                    y: 0,
-                    velocityX: 0,
-                    velocityY: 0,
-                    onGround: false
-                };
+                // 重置位置
+                playerState.x = 50;
+                playerState.y = 0;
+                playerState.velocityX = 0;
+                playerState.velocityY = 0;
+                playerState.onGround = false;
+                
+                // 重置敌人位置
+                enemies.forEach((enemy, index) => {
+                    const positions = [
+                        { left: '250px', bottom: '20px' },
+                        { left: '300px', bottom: '90px' }
+                    ];
+                    enemy.style.left = positions[index % positions.length].left;
+                    enemy.style.bottom = positions[index % positions.length].bottom;
+                });
             }
         }
 
@@ -545,43 +544,44 @@
             gameRunning = false;
             cancelAnimationFrame(animationId);
             finalScoreElement.textContent = score;
-            gameOverElement.classList.remove('hidden');
             startBtn.textContent = '开始游戏';
             startBtn.disabled = false;
+            gameOverElement.classList.remove('hidden');
         }
 
-        // 渲染游戏
-        function render() {
-            // 更新玩家位置
-            player.style.left = playerState.x + 'px';
-            player.style.bottom = playerState.y + 'px';
+        // 游戏主循环
+        function gameLoop() {
+            updateGameState();
+            animationId = requestAnimationFrame(gameLoop);
         }
 
-        // 键盘控制
+        // 键盘事件
         document.addEventListener('keydown', (e) => {
-            if (!gameRunning) return;
-            
-            if (e.key === 'ArrowLeft') {
-                playerState.velocityX = -PLAYER_SPEED;
-            } else if (e.key === 'ArrowRight') {
-                playerState.velocityX = PLAYER_SPEED;
-            } else if (e.key === ' ') {
-                if (playerState.onGround) {
-                    playerState.velocityY = -JUMP_POWER;
-                    playerState.onGround = false;
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', ' '].includes(e.key)) {
+                e.preventDefault();
+                
+                if (e.key === 'ArrowLeft') {
+                    movePlayer('left');
+                } else if (e.key === 'ArrowRight') {
+                    movePlayer('right');
+                } else if (e.key === 'ArrowUp' || e.key === ' ') {
+                    movePlayer('up');
                 }
             }
         });
 
         document.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-                playerState.velocityX = 0;
+            if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                stopPlayer();
             }
         });
 
         // 按钮事件
         startBtn.addEventListener('click', initGame);
         restartBtn.addEventListener('click', initGame);
+
+        // 初始化游戏
+        initGame();
     </script>
 </body>
 </html>
