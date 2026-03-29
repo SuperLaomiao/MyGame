@@ -152,17 +152,11 @@
             transform: translateX(-50%);
             z-index: 10;
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
-            animation: playerIdle 0.5s infinite alternate;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 24px;
             content: "🚀";
-        }
-
-        @keyframes playerIdle {
-            0% { transform: translateX(-50%) translateY(0); }
-            100% { transform: translateX(-50%) translateY(-5px); }
         }
 
         .player::before {
@@ -665,7 +659,7 @@
         }
 
         // 事件监听器
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', function(e) {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
                 e.preventDefault();
                 
