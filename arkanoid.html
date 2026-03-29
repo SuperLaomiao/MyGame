@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打砖块游戏</title>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .score, .lives {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .score-value, .lives-value {
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1976d2;
+        }
+
+        .game-board {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 600px;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .paddle {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 15px;
+            background-color: #2196f3;
+            border-radius: 7.5px;
+            cursor: pointer;
+        }
+
+        .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .brick {
+            position: absolute;
+            width: 60px;
+            height: 25px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-over h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .game-over p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-header,
+            .game-controls,
+            .game-board {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .game-board {
+                height: 300px;
+            }
+            
+            .paddle {
+                width: 80px;
+                height: 12px;
+            }
+            
+            .ball {
+                width: 15px;
+                height: 15px;
+            }
+            
+            .brick {
+                width: 45px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">打砖块游戏</h1>
+            <div class="game-stats">
+                <div class="score">
+                    <div>得分</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="lives">
+                    <div>生命</div>
+                    <div class="lives-value" id="lives">3</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div class="game-buttons">
+                <button class="btn" id="newGameBtn">新游戏</button>
+                <button class="btn" id="pauseBtn">暂停</button>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="paddle" id="paddle"></div>
+            <div class="ball" id="ball"></div>
+        </div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h2 id="gameOverTitle">游戏结束!</h2>
+            <p id="gameOverMessage">很遗憾，你没有完成任务！</p>
+            <p>得分: <span id="finalScore">0</span></p>
+            <button class="btn" id="restartBtn">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 打砖块游戏实现
+        const PADDLE_WIDTH = 100;
+        const PADDLE_HEIGHT = 15;
+        const BALL_RADIUS = 10;
+        const BRICK_WIDTH = 60;
+        const BRICK_HEIGHT = 25;
+        const BRICK_ROWS = 5;
+        const BRICK_COLS = 10;
+        const BRICK_PADDING = 5;
+        const BRICK_OFFSET_TOP = 50;
+        const BRICK_OFFSET_LEFT = 25;
+
+        const BRICK_COLORS = ['#ff0000', '#ffa500', '#ffff00', '#00ff00', '#0000ff'];
+
+        let paddle = { x: 250, y: 365, width: PADDLE_WIDTH, height: PADDLE_HEIGHT, speed: 10 };
+        let ball = { x: 300, y: 350, radius: BALL_RADIUS, dx: 2, dy: -2, speed: 4 };
+        let bricks = [];
+        let score = 0;
+        let lives = 3;
+        let gameOver = false;
+        let gameWon = false;
+        let gamePaused = false;
+        let animationId;
+
+        const gameBoardElement = document.getElementById('gameBoard');
+        const paddleElement = document.getElementById('paddle');
+        const ballElement = document.getElementById('ball');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const gameOverElement = document.getElementById('gameOver');
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const finalScoreElement = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 初始化游戏
+        function initGame() {
+            // 重置游戏状态
+            score = 0;
+            lives = 3;
+            gameOver = false;
+            gameWon = false;
+            gamePaused = false;
+            
+            // 重置 paddle 和 ball 位置
+            paddle.x = 250;
+            paddle.y = 365;
+            ball.x = 300;
+            ball.y = 350;
+            ball.dx = 2;
+            ball.dy = -2;
+            
+            // 初始化砖块
+            initBricks();
+            
+            // 更新 UI
+            scoreElement.textContent = score;
+            livesElement.textContent = lives;
+            gameOverElement.classList.add('hidden');
+            
+            // 开始游戏循环
+            gameLoop();
+        }
+
+        // 初始化砖块
+        function initBricks() {
+            bricks = [];
+            
+            for (let row = 0; row < BRICK_ROWS; row++) {
+                for (let col = 0; col < BRICK_COLS; col++) {
+                    const brick = {
+                        x: BRICK_OFFSET_LEFT + col * (BRICK_WIDTH + BRICK_PADDING),
+                        y: BRICK_OFFSET_TOP + row * (BRICK_HEIGHT + BRICK_PADDING),
+                        width: BRICK_WIDTH,
+                        height: BRICK_HEIGHT,
+                        color: BRICK_COLORS[row],
+                        visible: true
+                    };
+                    
+                    bricks.push(brick);
+                }
+            }
+            
+            renderBricks();
+        }
+
+        // 渲染砖块
+        function renderBricks() {
+            // 清除所有砖块
+            const existingBricks = document.querySelectorAll('.brick');
+            existingBricks.forEach(brick => brick.remove());
+            
+            // 渲染可见的砖块
+            bricks.forEach(brick => {
+                if (brick.visible) {
+                    const brickElement = document.createElement('div');
+                    brickElement.className = 'brick';
+                    brickElement.style.left = brick.x + 'px';
+                    brickElement.style.top = brick.y + 'px';
+                    brickElement.style.width = brick.width + 'px';
+                    brickElement.style.height = brick.height + 'px';
+                    brickElement.style.backgroundColor = brick.color;
+                    gameBoardElement.appendChild(brickElement);
+                }
+            });
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            if (gameOver || gameWon || gamePaused) {
+                animationId = requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            update();
+            draw();
+            
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        // 更新游戏状态
+        function update() {
+            // 更新 ball 位置
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            
+            // 碰撞检测 - 墙壁
+            if (ball.x + ball.radius > 600 || ball.x - ball.radius < 0) {
+                ball.dx = -ball.dx;
+            }
+            
+            if (ball.y - ball.radius < 0) {
+                ball.dy = -ball.dy;
+            }
+            
+            // 碰撞检测 - 地面（游戏结束）
+            if (ball.y + ball.radius > 400) {
+                lives--;
+                livesElement.textContent = lives;
+                
+                if (lives === 0) {
+                    gameOver = true;
+                    clearInterval(animationId);
+                    showGameOver('很遗憾，你没有完成任务！');
+                } else {
+                    // 重置 ball 位置
+                    ball.x = 300;
+                    ball.y = 350;
+                    ball.dx = 2;
+                    ball.dy = -2;
+                }
+            }
+            
+            // 碰撞检测 - 挡板
+            if (
+                ball.y + ball.radius > paddle.y &&
+                ball.y - ball.radius < paddle.y + paddle.height &&
+                ball.x > paddle.x &&
+                ball.x < paddle.x + paddle.width
+            ) {
+                ball.dy = -ball.dy;
+                
+                // 调整 ball 方向根据撞击位置
+                const hitPos = (ball.x - paddle.x) / paddle.width;
+                ball.dx = (hitPos - 0.5) * 10;
+            }
+            
+            // 碰撞检测 - 砖块
+            bricks.forEach(brick => {
+                if (brick.visible) {
+                    if (
+                        ball.x > brick.x &&
+                        ball.x < brick.x + brick.width &&
+                        ball.y > brick.y &&
+                        ball.y < brick.y + brick.height
+                    ) {
+                        ball.dy = -ball.dy;
+                        brick.visible = false;
+                        score += 10;
+                        scoreElement.textContent = score;
+                        
+                        // 检查是否获胜
+                        checkWin();
+                    }
+                }
+            });
+            
+            // 渲染砖块
+            renderBricks();
+        }
+
+        // 绘制游戏元素
+        function draw() {
+            // 更新 paddle 位置
+            paddleElement.style.left = paddle.x + 'px';
+            paddleElement.style.top = paddle.y + 'px';
+            paddleElement.style.width = paddle.width + 'px';
+            paddleElement.style.height = paddle.height + 'px';
+            
+            // 更新 ball 位置
+            ballElement.style.left = (ball.x - ball.radius) + 'px';
+            ballElement.style.top = (ball.y - ball.radius) + 'px';
+            ballElement.style.width = ball.radius * 2 + 'px';
+            ballElement.style.height = ball.radius * 2 + 'px';
+        }
+
+        // 检查是否获胜
+        function checkWin() {
+            const visibleBricks = bricks.filter(brick => brick.visible);
+            
+            if (visibleBricks.length === 0) {
+                gameWon = true;
+                clearInterval(animationId);
+                showGameOver('恭喜你，你完成了任务！', true);
+            }
+        }
+
+        // 显示游戏结束信息
+        function showGameOver(message, won = false) {
+            gameOverTitle.textContent = won ? '恭喜获胜！' : '游戏结束!';
+            gameOverMessage.textContent = message;
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.remove('hidden');
+        }
+
+        // 控制 paddle 移动
+        function movePaddle(direction) {
+            if (direction === 'left') {
+                paddle.x = Math.max(0, paddle.x - paddle.speed);
+            } else if (direction === 'right') {
+                paddle.x = Math.min(600 - paddle.width, paddle.x + paddle.speed);
+            }
+        }
+
+        // 事件监听器
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                movePaddle('left');
+            } else if (e.key === 'ArrowRight') {
+                movePaddle('right');
+            }
+        });
+
+        newGameBtn.addEventListener('click', initGame);
+        pauseBtn.addEventListener('click', () => {
+            gamePaused = !gamePaused;
+            pauseBtn.textContent = gamePaused ? '继续' : '暂停';
+        });
+        restartBtn.addEventListener('click', () => {
+            gameOverElement.classList.add('hidden');
+            initGame();
+        });
+
+        // 鼠标控制
+        gameBoardElement.addEventListener('mousemove', (e) => {
+            const rect = gameBoardElement.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            
+            paddle.x = Math.max(0, Math.min(600 - paddle.width, x - paddle.width / 2));
+        });
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>

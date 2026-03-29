@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>记忆翻牌游戏</title>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .moves, .timer, .matches {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .moves-value, .timer-value, .matches-value {
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .difficulty-btn {
+            padding: 8px 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .difficulty-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        .difficulty-btn.active {
+            background-color: #2196f3;
+            color: #fff;
+            border-color: #2196f3;
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1976d2;
+        }
+
+        .game-board {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: grid;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .card {
+            width: 60px;
+            height: 60px;
+            background-color: #2196f3;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .card.flipped {
+            background-color: #fff;
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            background-color: #4caf50;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .card-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: hidden;
+        }
+
+        .card-back {
+            background-color: #2196f3;
+            color: #2196f3;
+            border-radius: 8px;
+        }
+
+        .card-front {
+            background-color: #fff;
+            color: #333;
+            transform: rotateY(180deg);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-over h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .game-over p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-header,
+            .game-controls,
+            .game-board {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .card {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">记忆翻牌游戏</h1>
+            <div class="game-stats">
+                <div class="moves">
+                    <div>步数</div>
+                    <div class="moves-value" id="moves">0</div>
+                </div>
+                <div class="timer">
+                    <div>时间</div>
+                    <div class="timer-value" id="timer">0</div>
+                </div>
+                <div class="matches">
+                    <div>配对</div>
+                    <div class="matches-value" id="matches">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div class="difficulty-selector">
+                <button class="difficulty-btn active" data-difficulty="easy">简单</button>
+                <button class="difficulty-btn" data-difficulty="medium">中等</button>
+                <button class="difficulty-btn" data-difficulty="hard">困难</button>
+            </div>
+            <div class="game-buttons">
+                <button class="btn" id="newGameBtn">新游戏</button>
+                <button class="btn" id="pauseBtn">暂停</button>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard"></div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h2>恭喜获胜！</h2>
+            <p>你完成了游戏！</p>
+            <p>步数: <span id="finalMoves">0</span></p>
+            <p>时间: <span id="finalTime">0</span>秒</p>
+            <p>配对: <span id="finalMatches">0</span></p>
+            <button class="btn" id="restartBtn">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 记忆翻牌游戏实现
+        const DIFFICULTIES = {
+            easy: { rows: 3, cols: 4, pairs: 6 },
+            medium: { rows: 4, cols: 6, pairs: 12 },
+            hard: { rows: 5, cols: 8, pairs: 20 }
+        };
+
+        const SYMBOLS = ['🎈', '🎉', '🎊', '🎁', '🎀', '💝', '💖', '💗', '💓', '💞', '💕', '💟', '💜', '💛', '💚', '💙', '❤️', '🧡', '🍓', '🍒'];
+
+        let gameBoard = [];
+        let revealedCards = [];
+        let matchedPairs = 0;
+        let currentDifficulty = 'easy';
+        let moves = 0;
+        let timer = 0;
+        let timerInterval;
+        let gameOver = false;
+        let gamePaused = false;
+
+        const gameBoardElement = document.getElementById('gameBoard');
+        const movesElement = document.getElementById('moves');
+        const timerElement = document.getElementById('timer');
+        const matchesElement = document.getElementById('matches');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalMovesElement = document.getElementById('finalMoves');
+        const finalTimeElement = document.getElementById('finalTime');
+        const finalMatchesElement = document.getElementById('finalMatches');
+        const restartBtn = document.getElementById('restartBtn');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+
+        // 初始化游戏
+        function initGame(difficulty = 'easy') {
+            currentDifficulty = difficulty;
+            const config = DIFFICULTIES[difficulty];
+            
+            // 重置游戏状态
+            clearInterval(timerInterval);
+            moves = 0;
+            timer = 0;
+            matchedPairs = 0;
+            revealedCards = [];
+            gameOver = false;
+            gamePaused = false;
+            
+            // 初始化游戏板
+            initGameBoard(config);
+            
+            // 更新 UI
+            movesElement.textContent = moves;
+            timerElement.textContent = timer;
+            matchesElement.textContent = matchedPairs;
+            gameOverElement.classList.add('hidden');
+            
+            // 开始计时器
+            timerInterval = setInterval(() => {
+                if (!gamePaused) {
+                    timer++;
+                    timerElement.textContent = timer;
+                }
+            }, 1000);
+        }
+
+        // 初始化游戏板
+        function initGameBoard(config) {
+            // 生成游戏板内容
+            gameBoard = [];
+            const selectedSymbols = SYMBOLS.slice(0, config.pairs);
+            const board = [...selectedSymbols, ...selectedSymbols];
+            
+            // 随机洗牌
+            for (let i = board.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [board[i], board[j]] = [board[j], board[i]];
+            }
+            
+            gameBoard = board;
+            
+            // 渲染游戏板
+            renderGameBoard(config);
+        }
+
+        // 渲染游戏板
+        function renderGameBoard(config) {
+            gameBoardElement.innerHTML = '';
+            gameBoardElement.style.gridTemplateColumns = `repeat(${config.cols}, 60px)`;
+            
+            for (let i = 0; i < gameBoard.length; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = i;
+                
+                const cardContent = document.createElement('div');
+                cardContent.className = 'card-content card-back';
+                
+                const cardSymbol = document.createElement('div');
+                cardSymbol.className = 'card-content card-front';
+                cardSymbol.textContent = gameBoard[i];
+                
+                card.appendChild(cardContent);
+                card.appendChild(cardSymbol);
+                
+                card.addEventListener('click', () => flipCard(i));
+                
+                gameBoardElement.appendChild(card);
+            }
+        }
+
+        // 翻转卡片
+        function flipCard(index) {
+            if (gameOver || gamePaused) return;
+            if (revealedCards.length >= 2) return;
+            if (document.querySelector(`[data-index="${index}"].flipped`)) return;
+            
+            const cardElement = document.querySelector(`[data-index="${index}"]`);
+            cardElement.classList.add('flipped');
+            
+            revealedCards.push({ index, symbol: gameBoard[index] });
+            
+            // 检查是否有两张卡片翻转
+            if (revealedCards.length === 2) {
+                moves++;
+                movesElement.textContent = moves;
+                setTimeout(checkMatch, 1000);
+            }
+        }
+
+        // 检查是否匹配
+        function checkMatch() {
+            const [card1, card2] = revealedCards;
+            
+            if (card1.symbol === card2.symbol) {
+                // 匹配成功
+                document.querySelector(`[data-index="${card1.index}"]`).classList.add('matched');
+                document.querySelector(`[data-index="${card2.index}"]`).classList.add('matched');
+                matchedPairs++;
+                matchesElement.textContent = matchedPairs;
+                
+                // 检查是否完成游戏
+                if (matchedPairs === DIFFICULTIES[currentDifficulty].pairs) {
+                    gameOver = true;
+                    clearInterval(timerInterval);
+                    showGameOver();
+                }
+            } else {
+                // 匹配失败
+                document.querySelector(`[data-index="${card1.index}"]`).classList.remove('flipped');
+                document.querySelector(`[data-index="${card2.index}"]`).classList.remove('flipped');
+            }
+            
+            revealedCards = [];
+        }
+
+        // 显示游戏结束信息
+        function showGameOver() {
+            finalMovesElement.textContent = moves;
+            finalTimeElement.textContent = timer;
+            finalMatchesElement.textContent = matchedPairs;
+            gameOverElement.classList.remove('hidden');
+        }
+
+        // 暂停/继续游戏
+        function togglePause() {
+            if (gameOver) return;
+            
+            gamePaused = !gamePaused;
+            pauseBtn.textContent = gamePaused ? '继续' : '暂停';
+        }
+
+        // 事件监听器
+        newGameBtn.addEventListener('click', () => initGame(currentDifficulty));
+        pauseBtn.addEventListener('click', togglePause);
+        restartBtn.addEventListener('click', () => {
+            gameOverElement.classList.add('hidden');
+            initGame(currentDifficulty);
+        });
+
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                difficultyBtns.forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentDifficulty = e.target.dataset.difficulty;
+                initGame(currentDifficulty);
+            });
+        });
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>

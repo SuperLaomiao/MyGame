@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛车游戏</title>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            color: #333;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .score, .lives, .speed {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .score-value, .lives-value, .speed-value {
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1976d2;
+        }
+
+        .game-board {
+            background-color: #006600;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 600px;
+            height: 400px;
+            overflow: hidden;
+        }
+
+        .road {
+            position: absolute;
+            width: 400px;
+            height: 100%;
+            left: 100px;
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        .lane {
+            position: absolute;
+            width: 133px;
+            height: 100%;
+            border-right: 2px dashed #fff;
+            top: 0;
+        }
+
+        .player-car {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            background-color: #ff0000;
+            border-radius: 3px;
+            bottom: 20px;
+            left: 130px;
+            z-index: 10;
+        }
+
+        .enemy-car {
+            position: absolute;
+            width: 40px;
+            height: 60px;
+            border-radius: 3px;
+            top: -60px;
+            z-index: 5;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-over h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ff0000;
+        }
+
+        .game-over p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-header,
+            .game-controls,
+            .game-board {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .game-board {
+                height: 300px;
+            }
+            
+            .road {
+                width: 240px;
+                left: 30px;
+            }
+            
+            .lane {
+                width: 80px;
+            }
+            
+            .player-car,
+            .enemy-car {
+                width: 30px;
+                height: 45px;
+            }
+            
+            .player-car {
+                left: 75px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">赛车游戏</h1>
+            <div class="game-stats">
+                <div class="score">
+                    <div>得分</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="lives">
+                    <div>生命</div>
+                    <div class="lives-value" id="lives">3</div>
+                </div>
+                <div class="speed">
+                    <div>速度</div>
+                    <div class="speed-value" id="speed">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div class="game-buttons">
+                <button class="btn" id="newGameBtn">新游戏</button>
+                <button class="btn" id="pauseBtn">暂停</button>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="road" id="road">
+                <div class="lane" style="left: 0;"></div>
+                <div class="lane" style="left: 133px;"></div>
+                <div class="lane" style="left: 266px;"></div>
+                <div class="player-car" id="playerCar"></div>
+            </div>
+        </div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h2>游戏结束!</h2>
+            <p>很遗憾，你发生了碰撞！</p>
+            <p>得分: <span id="finalScore">0</span></p>
+            <p>最高速度: <span id="finalSpeed">0</span>km/h</p>
+            <button class="btn" id="restartBtn">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 赛车游戏实现
+        const LANES = [130, 265, 400]; // 每个车道的 X 坐标
+        const ENEMY_COLORS = ['#00ff00', '#0000ff', '#ffff00', '#ffa500'];
+        const ENEMY_SPEEDS = [2, 3, 4, 5];
+
+        let player = { x: LANES[1], y: 320, width: 40, height: 60, lane: 1, speed: 8 };
+        let enemyCars = [];
+        let score = 0;
+        let lives = 3;
+        let speed = 0;
+        let maxSpeed = 0;
+        let roadOffset = 0;
+        let gameOver = false;
+        let gamePaused = false;
+        let animationId;
+        let enemySpawnTimer;
+        let speedTimer;
+
+        const gameBoardElement = document.getElementById('gameBoard');
+        const roadElement = document.getElementById('road');
+        const playerCarElement = document.getElementById('playerCar');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const speedElement = document.getElementById('speed');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const finalSpeedElement = document.getElementById('finalSpeed');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 初始化游戏
+        function initGame() {
+            // 重置游戏状态
+            score = 0;
+            lives = 3;
+            speed = 0;
+            maxSpeed = 0;
+            roadOffset = 0;
+            enemyCars = [];
+            gameOver = false;
+            gamePaused = false;
+            
+            // 重置玩家位置
+            player.x = LANES[1];
+            player.y = 320;
+            player.lane = 1;
+            
+            // 更新 UI
+            scoreElement.textContent = score;
+            livesElement.textContent = lives;
+            speedElement.textContent = speed;
+            finalSpeedElement.textContent = maxSpeed;
+            gameOverElement.classList.add('hidden');
+            
+            // 开始游戏循环
+            startGameLoop();
+            startEnemySpawn();
+            startSpeedIncrease();
+        }
+
+        // 游戏循环
+        function startGameLoop() {
+            const loop = () => {
+                if (gameOver || gamePaused) {
+                    animationId = requestAnimationFrame(loop);
+                    return;
+                }
+                
+                update();
+                draw();
+                
+                animationId = requestAnimationFrame(loop);
+            };
+            loop();
+        }
+
+        // 更新游戏状态
+        function update() {
+            // 更新道路动画
+            roadOffset += speed / 10;
+            if (roadOffset > 100) {
+                roadOffset = 0;
+            }
+            
+            // 更新敌人汽车
+            enemyCars.forEach((car, index) => {
+                car.y += car.speed;
+                
+                // 检查是否超出边界
+                if (car.y > 400) {
+                    enemyCars.splice(index, 1);
+                    score += 10;
+                    scoreElement.textContent = score;
+                }
+                
+                // 检查碰撞
+                if (checkCollision(player, car)) {
+                    lives--;
+                    livesElement.textContent = lives;
+                    
+                    if (lives === 0) {
+                        gameOver = true;
+                        clearInterval(enemySpawnTimer);
+                        clearInterval(speedTimer);
+                        clearInterval(animationId);
+                        showGameOver();
+                    } else {
+                        enemyCars.splice(index, 1);
+                        // 重置玩家位置
+                        player.x = LANES[1];
+                        player.y = 320;
+                        player.lane = 1;
+                    }
+                }
+            });
+        }
+
+        // 检查碰撞
+        function checkCollision(car1, car2) {
+            return (
+                car1.x < car2.x + car2.width &&
+                car1.x + car1.width > car2.x &&
+                car1.y < car2.y + car2.height &&
+                car1.y + car1.height > car2.y
+            );
+        }
+
+        // 绘制游戏元素
+        function draw() {
+            // 绘制玩家汽车
+            playerCarElement.style.left = player.x + 'px';
+            playerCarElement.style.top = player.y + 'px';
+            playerCarElement.style.width = player.width + 'px';
+            playerCarElement.style.height = player.height + 'px';
+            
+            // 绘制敌人汽车
+            document.querySelectorAll('.enemy-car').forEach(el => el.remove());
+            enemyCars.forEach(car => {
+                const enemyElement = document.createElement('div');
+                enemyElement.className = 'enemy-car';
+                enemyElement.style.left = car.x + 'px';
+                enemyElement.style.top = car.y + 'px';
+                enemyElement.style.width = car.width + 'px';
+                enemyElement.style.height = car.height + 'px';
+                enemyElement.style.backgroundColor = car.color;
+                roadElement.appendChild(enemyElement);
+            });
+        }
+
+        // 生成敌人汽车
+        function spawnEnemy() {
+            if (gameOver || gamePaused) return;
+            
+            const lane = Math.floor(Math.random() * LANES.length);
+            const color = ENEMY_COLORS[Math.floor(Math.random() * ENEMY_COLORS.length)];
+            const enemySpeed = ENEMY_SPEEDS[Math.floor(Math.random() * ENEMY_SPEEDS.length)];
+            
+            const car = {
+                x: LANES[lane],
+                y: -60,
+                width: 40,
+                height: 60,
+                lane: lane,
+                speed: enemySpeed,
+                color: color
+            };
+            
+            enemyCars.push(car);
+        }
+
+        // 开始生成敌人
+        function startEnemySpawn() {
+            enemySpawnTimer = setInterval(spawnEnemy, 2000);
+        }
+
+        // 增加速度
+        function increaseSpeed() {
+            if (gameOver || gamePaused) return;
+            
+            speed += 1;
+            speedElement.textContent = speed;
+            
+            if (speed > maxSpeed) {
+                maxSpeed = speed;
+                finalSpeedElement.textContent = maxSpeed;
+            }
+        }
+
+        // 开始速度增加
+        function startSpeedIncrease() {
+            speedTimer = setInterval(increaseSpeed, 1000);
+        }
+
+        // 移动车道
+        function moveLane(direction) {
+            if (gameOver || gamePaused) return;
+            
+            const newLane = player.lane + direction;
+            
+            if (newLane >= 0 && newLane < LANES.length) {
+                player.lane = newLane;
+                player.x = LANES[newLane];
+            }
+        }
+
+        // 显示游戏结束信息
+        function showGameOver() {
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.remove('hidden');
+        }
+
+        // 事件监听器
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                moveLane(-1);
+            } else if (e.key === 'ArrowRight') {
+                moveLane(1);
+            }
+        });
+
+        newGameBtn.addEventListener('click', initGame);
+        pauseBtn.addEventListener('click', () => {
+            gamePaused = !gamePaused;
+            pauseBtn.textContent = gamePaused ? '继续' : '暂停';
+        });
+        restartBtn.addEventListener('click', () => {
+            gameOverElement.classList.add('hidden');
+            initGame();
+        });
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>

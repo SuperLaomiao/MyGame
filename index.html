@@ -340,15 +340,6 @@
                 description: '合并数字，得到2048！'
             },
             {
-                id: 'mario',
-                title: '超级马里奥',
-                category: 'action',
-                thumbnail: '🍄',
-                rating: 4.9,
-                plays: 20300,
-                description: '经典的平台跳跃游戏，拯救公主！'
-            },
-            {
                 id: 'sudoku',
                 title: '数独',
                 category: 'puzzle',
@@ -356,15 +347,6 @@
                 rating: 4.4,
                 plays: 7800,
                 description: '数字逻辑游戏，锻炼大脑！'
-            },
-            {
-                id: 'pacman',
-                title: '吃豆人',
-                category: 'arcade',
-                thumbnail: '🍒',
-                rating: 4.6,
-                plays: 11200,
-                description: '吃掉所有豆子，躲避幽灵！'
             },
             {
                 id: 'minesweeper',
@@ -385,7 +367,7 @@
                 description: '用球拍反弹球，击碎所有砖块！'
             },
             {
-                id: 'car-race',
+                id: 'race',
                 title: '赛车游戏',
                 category: 'sports',
                 thumbnail: '🏎️',
@@ -499,22 +481,34 @@
                         <iframe src="2048.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
                     </div>
                 `;
-            } else if (gameId === 'mario') {
-                gameContent.innerHTML = `
-                    <div style="display: flex; justify-content: center; padding: 20px;">
-                        <iframe src="mario.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
-                    </div>
-                `;
             } else if (gameId === 'sudoku') {
                 gameContent.innerHTML = `
                     <div style="display: flex; justify-content: center; padding: 20px;">
                         <iframe src="sudoku.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
                     </div>
                 `;
-            } else if (gameId === 'pacman') {
+            } else if (gameId === 'minesweeper') {
                 gameContent.innerHTML = `
                     <div style="display: flex; justify-content: center; padding: 20px;">
-                        <iframe src="pacman.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                        <iframe src="minesweeper.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'arkanoid') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="arkanoid.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'race') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="race.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'memory') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="memory.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
                     </div>
                 `;
             } else {
