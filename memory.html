@@ -8,140 +8,216 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
         crossorigin="anonymous"></script>
     <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 根变量定义 */
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --accent-color: #ffff00;
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
         body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 50%, var(--bg-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            color: #333;
-            font-family: Arial, sans-serif;
-            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
 
+        /* 背景动画 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundPulse 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundPulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+
+        /* 游戏容器 */
         .game-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+            max-width: 800px;
+            width: 100%;
+            margin: 20px;
         }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
+        /* 游戏标题 */
         .game-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
         }
 
-        .game-stats {
-            display: flex;
-            gap: 20px;
-            align-items: center;
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.3); }
         }
 
-        .moves, .timer, .matches {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .moves-value, .timer-value, .matches-value {
-            font-size: 24px;
-            color: #ff0000;
-        }
-
+        /* 游戏控制区域 */
         .game-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
         }
 
         .difficulty-selector {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .difficulty-btn {
-            padding: 8px 16px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            background-color: #fff;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            font-weight: 500;
         }
 
-        .difficulty-btn:hover {
-            background-color: #f0f0f0;
-        }
-
+        .difficulty-btn:hover,
         .difficulty-btn.active {
-            background-color: #2196f3;
-            color: #fff;
-            border-color: #2196f3;
+            background: var(--primary-color);
+            color: var(--bg-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 255, 255, 0.5);
         }
 
         .game-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 8px 16px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--bg-color);
             border: none;
-            border-radius: 5px;
-            background-color: #2196f3;
-            color: #fff;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            font-weight: 700;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
         }
 
         .btn:hover {
-            background-color: #1976d2;
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
         }
 
-        .game-board {
-            background-color: #fff;
-            border-radius: 8px;
+        /* 游戏信息 */
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: grid;
-            gap: 10px;
-            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* 游戏网格 */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-items: center;
+        }
+
+        /* 游戏卡片 */
         .card {
-            width: 60px;
-            height: 60px;
-            background-color: #2196f3;
-            border-radius: 8px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 2rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             position: relative;
-            transform-style: preserve-3d;
+            perspective: 1000px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
         }
 
         .card:hover {
             transform: scale(1.05);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
         }
 
         .card.flipped {
@@ -149,9 +225,12 @@
         }
 
         .card.matched {
-            background-color: #4caf50;
+            background: var(--accent-color);
+            color: var(--bg-color);
             cursor: default;
             pointer-events: none;
+            transform: scale(0.95);
+            transition: all 0.5s ease;
         }
 
         .card-content {
@@ -162,84 +241,141 @@
             justify-content: center;
             align-items: center;
             backface-visibility: hidden;
+            border-radius: var(--border-radius);
         }
 
         .card-back {
-            background-color: #2196f3;
-            border-radius: 8px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: transparent;
+            font-size: 0;
         }
 
         .card-front {
-            background-color: #fff;
+            background: var(--bg-color);
+            color: var(--primary-color);
             transform: rotateY(180deg);
+            border: 1px solid rgba(0, 255, 255, 0.3);
         }
 
+        /* 游戏结束界面 */
         .game-over {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 50px rgba(0, 0, 255, 0.5);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .game-over h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #ff0000;
-        }
-
-        .game-over p {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .hidden {
+            text-align: center;
             display: none;
         }
 
+        .game-over.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        .game-over p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        /* 响应式设计 */
         @media (max-width: 768px) {
-            .game-header,
-            .game-controls,
             .game-board {
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
             }
-            
+
             .card {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
+                width: 70px;
+                height: 70px;
+                font-size: 1.5rem;
             }
+
+            .game-title {
+                font-size: 2rem;
+            }
+
+            .difficulty-selector,
+            .game-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .difficulty-btn,
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <div class="game-header">
-            <h1 class="game-title">记忆翻牌游戏</h1>
-            <div class="game-stats">
-                <div class="moves">
-                    <div>步数</div>
-                    <div class="moves-value" id="moves">0</div>
-                </div>
-                <div class="timer">
-                    <div>时间</div>
-                    <div class="timer-value" id="timer">0</div>
-                </div>
-                <div class="matches">
-                    <div>配对</div>
-                    <div class="matches-value" id="matches">0</div>
-                </div>
-            </div>
-        </div>
-
+        <button class="back-btn" onclick="window.location.href='index.html'">← 回到主页</button>
+        <h1 class="game-title">🧠 记忆翻牌</h1>
+        
         <div class="game-controls">
             <div class="difficulty-selector">
                 <button class="difficulty-btn active" data-difficulty="easy">简单</button>
@@ -252,14 +388,29 @@
             </div>
         </div>
 
+        <div class="game-info">
+            <div class="info-item">
+                <span class="info-label">时间</span>
+                <span class="info-value" id="time">00:00</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">步数</span>
+                <span class="info-value" id="moves">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">匹配</span>
+                <span class="info-value" id="matches">0</span>
+            </div>
+        </div>
+
         <div class="game-board" id="gameBoard"></div>
 
-        <div class="game-over hidden" id="gameOver">
-            <h2>恭喜获胜！</h2>
-            <p>你完成了游戏！</p>
+        <div class="game-over" id="gameOver">
+            <h2 id="gameOverTitle">恭喜获胜！</h2>
+            <p id="gameOverMessage">你完成了游戏！</p>
+            <p>时间: <span id="finalTime">00:00</span></p>
             <p>步数: <span id="finalMoves">0</span></p>
-            <p>时间: <span id="finalTime">0</span>秒</p>
-            <p>配对: <span id="finalMatches">0</span></p>
+            <p>匹配: <span id="finalMatches">0</span></p>
             <button class="btn" id="restartBtn">再玩一次</button>
         </div>
     </div>
@@ -267,9 +418,9 @@
     <script>
         // 记忆翻牌游戏实现
         const DIFFICULTIES = {
-            easy: { rows: 3, cols: 4, pairs: 6 },
-            medium: { rows: 4, cols: 6, pairs: 12 },
-            hard: { rows: 5, cols: 8, pairs: 20 }
+            easy: { rows: 4, cols: 4, pairs: 8 },
+            medium: { rows: 6, cols: 6, pairs: 18 },
+            hard: { rows: 8, cols: 8, pairs: 32 }
         };
 
         const SYMBOLS = ['🎈', '🎉', '🎊', '🎁', '🎀', '💝', '💖', '💗', '💓', '💞', '💕', '💟', '💜', '💛', '💚', '💙', '❤️', '🧡', '🍓', '🍒'];
@@ -285,14 +436,16 @@
         let gamePaused = false;
 
         const gameBoardElement = document.getElementById('gameBoard');
+        const timeElement = document.getElementById('time');
         const movesElement = document.getElementById('moves');
-        const timerElement = document.getElementById('timer');
         const matchesElement = document.getElementById('matches');
         const newGameBtn = document.getElementById('newGameBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const gameOverElement = document.getElementById('gameOver');
-        const finalMovesElement = document.getElementById('finalMoves');
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const gameOverMessage = document.getElementById('gameOverMessage');
         const finalTimeElement = document.getElementById('finalTime');
+        const finalMovesElement = document.getElementById('finalMoves');
         const finalMatchesElement = document.getElementById('finalMatches');
         const restartBtn = document.getElementById('restartBtn');
         const difficultyBtns = document.querySelectorAll('.difficulty-btn');
@@ -316,17 +469,24 @@
             
             // 更新 UI
             movesElement.textContent = moves;
-            timerElement.textContent = timer;
             matchesElement.textContent = matchedPairs;
-            gameOverElement.classList.add('hidden');
+            timeElement.textContent = '00:00';
+            gameOverElement.classList.remove('active');
             
             // 开始计时器
             timerInterval = setInterval(() => {
                 if (!gamePaused) {
                     timer++;
-                    timerElement.textContent = timer;
+                    timeElement.textContent = formatTime(timer);
                 }
             }, 1000);
+        }
+
+        // 格式化时间
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
         // 初始化游戏板
@@ -351,7 +511,7 @@
         // 渲染游戏板
         function renderGameBoard(config) {
             gameBoardElement.innerHTML = '';
-            gameBoardElement.style.gridTemplateColumns = `repeat(${config.cols}, 60px)`;
+            gameBoardElement.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
             
             for (let i = 0; i < gameBoard.length; i++) {
                 const card = document.createElement('div');
@@ -408,7 +568,7 @@
                 if (matchedPairs === DIFFICULTIES[currentDifficulty].pairs) {
                     gameOver = true;
                     clearInterval(timerInterval);
-                    showGameOver();
+                    showGameOver('你完成了游戏！');
                 }
             } else {
                 // 匹配失败
@@ -420,11 +580,13 @@
         }
 
         // 显示游戏结束信息
-        function showGameOver() {
+        function showGameOver(message) {
+            gameOverTitle.textContent = '恭喜获胜！';
+            gameOverMessage.textContent = message;
+            finalTimeElement.textContent = formatTime(timer);
             finalMovesElement.textContent = moves;
-            finalTimeElement.textContent = timer;
             finalMatchesElement.textContent = matchedPairs;
-            gameOverElement.classList.remove('hidden');
+            gameOverElement.classList.add('active');
         }
 
         // 暂停/继续游戏
@@ -439,7 +601,7 @@
         newGameBtn.addEventListener('click', () => initGame(currentDifficulty));
         pauseBtn.addEventListener('click', togglePause);
         restartBtn.addEventListener('click', () => {
-            gameOverElement.classList.add('hidden');
+            gameOverElement.classList.remove('active');
             initGame(currentDifficulty);
         });
 

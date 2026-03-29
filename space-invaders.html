@@ -8,132 +8,191 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
         crossorigin="anonymous"></script>
     <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 根变量定义 */
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --accent-color: #ffff00;
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
         body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 50%, var(--bg-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            margin: 0;
             overflow: hidden;
+            position: relative;
         }
 
+        /* 背景动画 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundPulse 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundPulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+
+        /* 游戏容器 */
         .game-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+            max-width: 1000px;
+            width: 100%;
+            margin: 20px;
         }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-        }
-
+        /* 游戏标题 */
         .game-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0;
-            color: #00ff00;
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
         }
 
-        .game-stats {
-            display: flex;
-            gap: 20px;
-            align-items: center;
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.3); }
         }
 
-        .score, .lives {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .score-value, .lives-value {
-            font-size: 24px;
-            color: #00ffff;
-        }
-
+        /* 游戏控制区域 */
         .game-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
         }
 
         .game-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 8px 16px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--bg-color);
             border: none;
-            border-radius: 5px;
-            background-color: rgba(0, 255, 0, 0.7);
-            color: #fff;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+            font-weight: 700;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
         }
 
         .btn:hover {
-            background-color: rgba(0, 255, 0, 0.9);
             transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
         }
 
+        /* 游戏信息 */
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* 游戏板 */
         .game-board {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             position: relative;
-            width: 800px;
             height: 600px;
-            background-color: rgba(0, 0, 0, 0.9);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            border: 2px solid rgba(0, 255, 0, 0.5);
+            margin-bottom: 30px;
         }
 
+        /* 游戏背景 */
         .game-bg {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, #000011, #000033);
-            background-size: 100% 200%;
-            animation: bgAnimation 10s linear infinite;
-        }
-
-        @keyframes bgAnimation {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 200%; }
-        }
-
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 255, 0.5) 100%);
+            z-index: -1;
+            overflow: hidden;
         }
 
         .star {
             position: absolute;
             width: 2px;
             height: 2px;
-            background-color: #fff;
+            background: white;
             border-radius: 50%;
-            opacity: 0.8;
-            animation: twinkle 1.5s infinite alternate;
+            animation: twinkle 2s infinite alternate;
         }
 
         @keyframes twinkle {
@@ -141,154 +200,191 @@
             100% { opacity: 1; }
         }
 
+        /* 游戏元素 */
         .player {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            background-color: #00ffff;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             border-radius: 50%;
             bottom: 50px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            font-size: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
-            content: "🚀";
+            z-index: 10;
         }
 
-        .player::before {
-            content: "🚀";
-            position: absolute;
+        .player:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
         }
 
         .enemy {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #ff0000;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
             border-radius: 50%;
-            top: -30px;
-            left: 0;
-            z-index: 5;
-            box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
-            animation: enemyEntry 0.5s ease-out forwards;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            font-size: 1.5rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 18px;
+            z-index: 5;
         }
 
-        .enemy::before {
-            content: "👾";
-            position: absolute;
-        }
-
-        @keyframes enemyEntry {
-            from {
-                opacity: 0;
-                transform: scale(0.5) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+        .enemy:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 0, 255, 0.6);
         }
 
         .bullet {
             position: absolute;
-            width: 4px;
-            height: 15px;
-            background-color: #ffff00;
+            width: 5px;
+            height: 20px;
+            background: var(--accent-color);
             border-radius: 2px;
-            bottom: 60px;
-            left: 0;
-            z-index: 15;
-            box-shadow: 0 0 5px rgba(255, 255, 0, 0.7);
+            box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+            animation: bulletMove 0.5s linear infinite;
         }
 
+        @keyframes bulletMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        /* 游戏结束界面 */
         .game-over {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.95);
-            color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 50px rgba(0, 0, 255, 0.5);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             z-index: 1000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
-            border: 2px solid rgba(255, 0, 0, 0.7);
-        }
-
-        .game-over h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #ff0000;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-        }
-
-        .game-over p {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .hidden {
+            text-align: center;
             display: none;
         }
 
-        @media (max-width: 768px) {
-            .game-header,
-            .game-controls,
-            .game-board {
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
+        .game-over.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
             }
-            
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        .game-over p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
             .game-board {
                 height: 400px;
             }
-            
+
             .player {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+
+            .enemy {
                 width: 30px;
                 height: 30px;
-                left: 50%;
-                transform: translateX(-50%);
-                bottom: 30px;
+                font-size: 1rem;
             }
-            
-            .enemy {
-                width: 20px;
-                height: 20px;
+
+            .game-title {
+                font-size: 2rem;
             }
-            
-            .bullet {
-                width: 3px;
-                height: 10px;
+
+            .game-buttons {
+                flex-direction: column;
+                width: 100%;
             }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <div class="game-header">
-            <h1 class="game-title">🚀 太空侵略者</h1>
-            <div class="game-stats">
-                <div class="score">
-                    <div>得分</div>
-                    <div class="score-value" id="score">0</div>
-                </div>
-                <div class="lives">
-                    <div>生命</div>
-                    <div class="lives-value" id="lives">3</div>
-                </div>
-            </div>
-        </div>
-
+        <button class="back-btn" onclick="window.location.href='index.html'">← 回到主页</button>
+        <h1 class="game-title">🚀 太空侵略者</h1>
+        
         <div class="game-controls">
             <div class="game-buttons">
                 <button class="btn" id="newGameBtn">新游戏</button>
@@ -296,16 +392,31 @@
             </div>
         </div>
 
-        <div class="game-board" id="gameBoard">
-            <div class="game-bg"></div>
-            <div class="stars" id="stars"></div>
-            <div class="player" id="player"></div>
+        <div class="game-info">
+            <div class="info-item">
+                <span class="info-label">得分</span>
+                <span class="info-value" id="score">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">生命</span>
+                <span class="info-value" id="lives">3</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">波数</span>
+                <span class="info-value" id="wave">1</span>
+            </div>
         </div>
 
-        <div class="game-over hidden" id="gameOver">
+        <div class="game-board" id="gameBoard">
+            <div class="game-bg" id="gameBg"></div>
+        </div>
+
+        <div class="game-over" id="gameOver">
             <h2 id="gameOverTitle">游戏结束!</h2>
             <p id="gameOverMessage">很遗憾，你被敌机击中了！</p>
             <p>得分: <span id="finalScore">0</span></p>
+            <p>生命: <span id="finalLives">3</span></p>
+            <p>波数: <span id="finalWave">1</span></p>
             <button class="btn" id="restartBtn">再玩一次</button>
         </div>
     </div>
@@ -321,12 +432,13 @@
         const ENEMY_SPAWN_INTERVAL = 1000;
         const PLAYER_BULLET_DAMAGE = 1;
 
-        let player = { x: 400, y: 500, width: 40, height: 40, speed: PLAYER_SPEED, lastShot: 0 };
+        let player = { x: 400, y: 500, width: 50, height: 50, speed: PLAYER_SPEED, lastShot: 0 };
         let enemies = [];
         let bullets = [];
         let enemyBullets = [];
         let score = 0;
         let lives = 3;
+        let wave = 1;
         let gameOver = false;
         let gamePaused = false;
         let animationId;
@@ -335,19 +447,21 @@
         let lastRenderTime = 0;
         const MAX_FPS = 60;
         const MIN_FRAME_TIME = 1000 / MAX_FPS;
-        let keysPressed = {}; // 记录当前按下的按键
+        let keysPressed = {};
 
         const gameBoardElement = document.getElementById('gameBoard');
-        const starsElement = document.getElementById('stars');
-        const playerElement = document.getElementById('player');
+        const gameBgElement = document.getElementById('gameBg');
         const scoreElement = document.getElementById('score');
         const livesElement = document.getElementById('lives');
+        const waveElement = document.getElementById('wave');
         const newGameBtn = document.getElementById('newGameBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const gameOverElement = document.getElementById('gameOver');
         const gameOverTitle = document.getElementById('gameOverTitle');
         const gameOverMessage = document.getElementById('gameOverMessage');
         const finalScoreElement = document.getElementById('finalScore');
+        const finalLivesElement = document.getElementById('finalLives');
+        const finalWaveElement = document.getElementById('finalWave');
         const restartBtn = document.getElementById('restartBtn');
 
         // 初始化游戏
@@ -362,6 +476,7 @@
             enemyBullets = [];
             score = 0;
             lives = 3;
+            wave = 1;
             gameOver = false;
             gamePaused = false;
             lastRenderTime = 0;
@@ -374,7 +489,8 @@
             // 更新 UI
             scoreElement.textContent = score;
             livesElement.textContent = lives;
-            gameOverElement.classList.add('hidden');
+            waveElement.textContent = wave;
+            gameOverElement.classList.remove('active');
             
             // 生成星星背景
             generateStars();
@@ -388,7 +504,7 @@
 
         // 生成星星背景
         function generateStars() {
-            starsElement.innerHTML = '';
+            gameBgElement.innerHTML = '';
             const starCount = 200;
             
             for (let i = 0; i < starCount; i++) {
@@ -397,7 +513,7 @@
                 star.style.left = `${Math.random() * GAME_WIDTH}px`;
                 star.style.top = `${Math.random() * GAME_HEIGHT}px`;
                 star.style.animationDuration = `${Math.random() * 2 + 1}s`;
-                starsElement.appendChild(star);
+                gameBgElement.appendChild(star);
             }
         }
 
@@ -406,10 +522,10 @@
             if (gameOver || gamePaused) return;
             
             const enemy = {
-                x: Math.random() * (GAME_WIDTH - 30),
-                y: -30,
-                width: 30,
-                height: 30,
+                x: Math.random() * (GAME_WIDTH - 50),
+                y: -50,
+                width: 40,
+                height: 40,
                 speed: ENEMY_SPEED,
                 direction: 1
             };
@@ -418,6 +534,7 @@
             enemyElement.className = 'enemy';
             enemyElement.style.left = `${enemy.x}px`;
             enemyElement.style.top = `${enemy.y}px`;
+            enemyElement.textContent = '👾';
             gameBoardElement.appendChild(enemyElement);
             
             enemy.element = enemyElement;
@@ -431,7 +548,6 @@
                 return;
             }
             
-            // 控制帧率
             const elapsed = timestamp - lastRenderTime;
             if (elapsed < MIN_FRAME_TIME) {
                 animationId = requestAnimationFrame(gameLoop);
@@ -439,9 +555,6 @@
             }
             
             lastRenderTime = timestamp;
-            
-            // 处理键盘输入
-            handleKeyboardInput();
             
             update();
             draw();
@@ -470,6 +583,9 @@
 
         // 更新游戏状态
         function update() {
+            // 处理键盘输入
+            handleKeyboardInput();
+            
             // 更新敌人
             enemies.forEach((enemy, index) => {
                 enemy.y += enemy.speed;
@@ -630,8 +746,17 @@
         // 绘制游戏元素
         function draw() {
             // 绘制玩家
-            playerElement.style.left = `${player.x}px`;
-            playerElement.style.top = `${player.y}px`;
+            const playerElement = document.querySelector('.player');
+            if (!playerElement) {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'player';
+                playerDiv.textContent = '🚀';
+                gameBoardElement.appendChild(playerDiv);
+            }
+            
+            const playerDiv = document.querySelector('.player');
+            playerDiv.style.left = `${player.x}px`;
+            playerDiv.style.top = `${player.y}px`;
         }
 
         // 显示游戏结束信息
@@ -639,7 +764,9 @@
             gameOverTitle.textContent = '游戏结束!';
             gameOverMessage.textContent = message;
             finalScoreElement.textContent = score;
-            gameOverElement.classList.remove('hidden');
+            finalLivesElement.textContent = lives;
+            finalWaveElement.textContent = wave;
+            gameOverElement.classList.add('active');
         }
 
         // 玩家射击
@@ -669,15 +796,28 @@
             lastShotTime = currentTime;
         }
 
+        // 移动玩家
+        function movePlayer(direction) {
+            if (direction === 'left') {
+                player.x = Math.max(0, player.x - player.speed);
+            } else if (direction === 'right') {
+                player.x = Math.min(GAME_WIDTH - player.width, player.x + player.speed);
+            } else if (direction === 'up') {
+                player.y = Math.max(0, player.y - player.speed);
+            } else if (direction === 'down') {
+                player.y = Math.min(GAME_HEIGHT - player.height, player.y + player.speed);
+            }
+        }
+
         // 事件监听器
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', (e) => {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
                 e.preventDefault();
                 keysPressed[e.key] = true;
             }
         });
 
-        document.addEventListener('keyup', function(e) {
+        document.addEventListener('keyup', (e) => {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(e.key)) {
                 e.preventDefault();
                 keysPressed[e.key] = false;
@@ -690,7 +830,7 @@
             pauseBtn.textContent = gamePaused ? '继续' : '暂停';
         });
         restartBtn.addEventListener('click', () => {
-            gameOverElement.classList.add('hidden');
+            gameOverElement.classList.remove('active');
             initGame();
         });
 
