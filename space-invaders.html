@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太空侵略者</title>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
+        crossorigin="anonymous"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .game-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .score, .lives {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .score-value, .lives-value {
+            font-size: 24px;
+            color: #00ffff;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(0, 255, 0, 0.7);
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+        }
+
+        .btn:hover {
+            background-color: rgba(0, 255, 0, 0.9);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+        }
+
+        .game-board {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            border: 2px solid rgba(0, 255, 0, 0.5);
+        }
+
+        .game-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #000011, #000033);
+            background-size: 100% 200%;
+            animation: bgAnimation 10s linear infinite;
+        }
+
+        @keyframes bgAnimation {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 200%; }
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: #fff;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: twinkle 1.5s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #00ffff;
+            border-radius: 50%;
+            bottom: 20px;
+            left: 380px;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+            animation: playerIdle 0.5s infinite alternate;
+        }
+
+        @keyframes playerIdle {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .enemy {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #ff0000;
+            border-radius: 50%;
+            top: -30px;
+            left: 0;
+            z-index: 5;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+            animation: enemyEntry 0.5s ease-out forwards;
+        }
+
+        @keyframes enemyEntry {
+            from {
+                opacity: 0;
+                transform: scale(0.5) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .bullet {
+            position: absolute;
+            width: 4px;
+            height: 15px;
+            background-color: #ffff00;
+            border-radius: 2px;
+            bottom: 60px;
+            left: 0;
+            z-index: 15;
+            box-shadow: 0 0 5px rgba(255, 255, 0, 0.7);
+        }
+
+        .game-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+            border: 2px solid rgba(255, 0, 0, 0.7);
+        }
+
+        .game-over h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+
+        .game-over p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .game-header,
+            .game-controls,
+            .game-board {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .game-board {
+                height: 400px;
+            }
+            
+            .player {
+                width: 30px;
+                height: 30px;
+                left: 135px;
+            }
+            
+            .enemy {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .bullet {
+                width: 3px;
+                height: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">🚀 太空侵略者</h1>
+            <div class="game-stats">
+                <div class="score">
+                    <div>得分</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="lives">
+                    <div>生命</div>
+                    <div class="lives-value" id="lives">3</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <div class="game-buttons">
+                <button class="btn" id="newGameBtn">新游戏</button>
+                <button class="btn" id="pauseBtn">暂停</button>
+            </div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="game-bg"></div>
+            <div class="stars" id="stars"></div>
+            <div class="player" id="player"></div>
+        </div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h2 id="gameOverTitle">游戏结束!</h2>
+            <p id="gameOverMessage">很遗憾，你被敌机击中了！</p>
+            <p>得分: <span id="finalScore">0</span></p>
+            <button class="btn" id="restartBtn">再玩一次</button>
+        </div>
+    </div>
+
+    <script>
+        // 太空侵略者游戏实现
+        const GAME_WIDTH = 800;
+        const GAME_HEIGHT = 600;
+        const PLAYER_SPEED = 5;
+        const ENEMY_SPEED = 2;
+        const BULLET_SPEED = 10;
+        const PLAYER_BULLET_COOLDOWN = 300;
+        const ENEMY_SPAWN_INTERVAL = 1000;
+        const PLAYER_BULLET_DAMAGE = 1;
+
+        let player = { x: 380, y: 540, width: 40, height: 40, speed: PLAYER_SPEED, lastShot: 0 };
+        let enemies = [];
+        let bullets = [];
+        let enemyBullets = [];
+        let score = 0;
+        let lives = 3;
+        let gameOver = false;
+        let gamePaused = false;
+        let animationId;
+        let enemySpawnTimer;
+        let lastShotTime = 0;
+
+        const gameBoardElement = document.getElementById('gameBoard');
+        const starsElement = document.getElementById('stars');
+        const playerElement = document.getElementById('player');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const newGameBtn = document.getElementById('newGameBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const gameOverElement = document.getElementById('gameOver');
+        const gameOverTitle = document.getElementById('gameOverTitle');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+        const finalScoreElement = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 初始化游戏
+        function initGame() {
+            // 清除游戏状态
+            enemies.forEach(enemy => enemy.element.remove());
+            bullets.forEach(bullet => bullet.element.remove());
+            enemyBullets.forEach(bullet => bullet.element.remove());
+            
+            enemies = [];
+            bullets = [];
+            enemyBullets = [];
+            score = 0;
+            lives = 3;
+            gameOver = false;
+            gamePaused = false;
+            
+            // 重置玩家位置
+            player.x = 380;
+            player.y = 540;
+            
+            // 更新 UI
+            scoreElement.textContent = score;
+            livesElement.textContent = lives;
+            gameOverElement.classList.add('hidden');
+            
+            // 生成星星背景
+            generateStars();
+            
+            // 开始游戏循环
+            animationId = requestAnimationFrame(gameLoop);
+            
+            // 开始生成敌人
+            enemySpawnTimer = setInterval(spawnEnemy, ENEMY_SPAWN_INTERVAL);
+        }
+
+        // 生成星星背景
+        function generateStars() {
+            starsElement.innerHTML = '';
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * GAME_WIDTH}px`;
+                star.style.top = `${Math.random() * GAME_HEIGHT}px`;
+                star.style.animationDuration = `${Math.random() * 2 + 1}s`;
+                starsElement.appendChild(star);
+            }
+        }
+
+        // 生成敌人
+        function spawnEnemy() {
+            if (gameOver || gamePaused) return;
+            
+            const enemy = {
+                x: Math.random() * (GAME_WIDTH - 30),
+                y: -30,
+                width: 30,
+                height: 30,
+                speed: ENEMY_SPEED,
+                direction: 1
+            };
+            
+            const enemyElement = document.createElement('div');
+            enemyElement.className = 'enemy';
+            enemyElement.style.left = `${enemy.x}px`;
+            enemyElement.style.top = `${enemy.y}px`;
+            gameBoardElement.appendChild(enemyElement);
+            
+            enemy.element = enemyElement;
+            enemies.push(enemy);
+        }
+
+        // 游戏循环
+        function gameLoop() {
+            if (gameOver || gamePaused) {
+                animationId = requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            update();
+            draw();
+            
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        // 更新游戏状态
+        function update() {
+            // 更新敌人
+            enemies.forEach((enemy, index) => {
+                enemy.y += enemy.speed;
+                
+                // 检查是否到达底部
+                if (enemy.y > GAME_HEIGHT) {
+                    enemy.element.remove();
+                    enemies.splice(index, 1);
+                    // 减少生命
+                    lives--;
+                    livesElement.textContent = lives;
+                    
+                    if (lives === 0) {
+                        gameOver = true;
+                        clearInterval(enemySpawnTimer);
+                        clearInterval(animationId);
+                        showGameOver('很遗憾，你被敌机击中了！');
+                    }
+                } else {
+                    enemy.element.style.top = `${enemy.y}px`;
+                }
+            });
+            
+            // 更新子弹
+            bullets.forEach((bullet, index) => {
+                bullet.y -= BULLET_SPEED;
+                
+                // 检查是否到达顶部
+                if (bullet.y < 0) {
+                    bullet.element.remove();
+                    bullets.splice(index, 1);
+                } else {
+                    bullet.element.style.top = `${bullet.y}px`;
+                }
+            });
+            
+            // 更新敌机子弹
+            enemyBullets.forEach((bullet, index) => {
+                bullet.y += BULLET_SPEED;
+                
+                // 检查是否到达底部
+                if (bullet.y > GAME_HEIGHT) {
+                    bullet.element.remove();
+                    enemyBullets.splice(index, 1);
+                } else {
+                    bullet.element.style.top = `${bullet.y}px`;
+                }
+            });
+            
+            // 碰撞检测
+            checkCollisions();
+            
+            // 敌机射击
+            enemies.forEach(enemy => {
+                if (Math.random() < 0.005) {
+                    enemyShoot(enemy);
+                }
+            });
+        }
+
+        // 敌机射击
+        function enemyShoot(enemy) {
+            const bullet = {
+                x: enemy.x + enemy.width / 2 - 2,
+                y: enemy.y + enemy.height,
+                width: 4,
+                height: 15
+            };
+            
+            const bulletElement = document.createElement('div');
+            bulletElement.className = 'bullet';
+            bulletElement.style.left = `${bullet.x}px`;
+            bulletElement.style.top = `${bullet.y}px`;
+            gameBoardElement.appendChild(bulletElement);
+            
+            bullet.element = bulletElement;
+            enemyBullets.push(bullet);
+        }
+
+        // 检查碰撞
+        function checkCollisions() {
+            // 玩家子弹击中敌人
+            bullets.forEach((bullet, bulletIndex) => {
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (
+                        bullet.x < enemy.x + enemy.width &&
+                        bullet.x + bullet.width > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + bullet.height > enemy.y
+                    ) {
+                        // 击中敌人
+                        bullet.element.remove();
+                        bullets.splice(bulletIndex, 1);
+                        
+                        enemy.element.remove();
+                        enemies.splice(enemyIndex, 1);
+                        
+                        score += 10;
+                        scoreElement.textContent = score;
+                    }
+                });
+            });
+            
+            // 敌机子弹击中玩家
+            enemyBullets.forEach((bullet, index) => {
+                if (
+                    bullet.x < player.x + player.width &&
+                    bullet.x + bullet.width > player.x &&
+                    bullet.y < player.y + player.height &&
+                    bullet.y + bullet.height > player.y
+                ) {
+                    bullet.element.remove();
+                    enemyBullets.splice(index, 1);
+                    
+                    lives--;
+                    livesElement.textContent = lives;
+                    
+                    if (lives === 0) {
+                        gameOver = true;
+                        clearInterval(enemySpawnTimer);
+                        clearInterval(animationId);
+                        showGameOver('很遗憾，你被敌机击中了！');
+                    }
+                }
+            });
+            
+            // 敌机碰撞玩家
+            enemies.forEach((enemy, index) => {
+                if (
+                    enemy.x < player.x + player.width &&
+                    enemy.x + enemy.width > player.x &&
+                    enemy.y < player.y + player.height &&
+                    enemy.y + enemy.height > player.y
+                ) {
+                    enemy.element.remove();
+                    enemies.splice(index, 1);
+                    
+                    lives--;
+                    livesElement.textContent = lives;
+                    
+                    if (lives === 0) {
+                        gameOver = true;
+                        clearInterval(enemySpawnTimer);
+                        clearInterval(animationId);
+                        showGameOver('很遗憾，你被敌机击中了！');
+                    }
+                }
+            });
+        }
+
+        // 绘制游戏元素
+        function draw() {
+            // 绘制玩家
+            playerElement.style.left = `${player.x}px`;
+            playerElement.style.top = `${player.y}px`;
+        }
+
+        // 显示游戏结束信息
+        function showGameOver(message) {
+            gameOverTitle.textContent = '游戏结束!';
+            gameOverMessage.textContent = message;
+            finalScoreElement.textContent = score;
+            gameOverElement.classList.remove('hidden');
+        }
+
+        // 玩家射击
+        function playerShoot() {
+            const currentTime = Date.now();
+            
+            if (currentTime - lastShotTime < PLAYER_BULLET_COOLDOWN) {
+                return;
+            }
+            
+            const bullet = {
+                x: player.x + player.width / 2 - 2,
+                y: player.y,
+                width: 4,
+                height: 15
+            };
+            
+            const bulletElement = document.createElement('div');
+            bulletElement.className = 'bullet';
+            bulletElement.style.left = `${bullet.x}px`;
+            bulletElement.style.top = `${bullet.y}px`;
+            gameBoardElement.appendChild(bulletElement);
+            
+            bullet.element = bulletElement;
+            bullets.push(bullet);
+            
+            lastShotTime = currentTime;
+        }
+
+        // 移动玩家
+        function movePlayer(direction) {
+            if (direction === 'left') {
+                player.x = Math.max(0, player.x - player.speed);
+            } else if (direction === 'right') {
+                player.x = Math.min(GAME_WIDTH - player.width, player.x + player.speed);
+            }
+        }
+
+        // 事件监听器
+        document.addEventListener('keydown', (e) => {
+            if (['ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+                e.preventDefault();
+                
+                if (e.key === 'ArrowLeft') {
+                    movePlayer('left');
+                } else if (e.key === 'ArrowRight') {
+                    movePlayer('right');
+                } else if (e.key === ' ' && !gameOver && !gamePaused) {
+                    playerShoot();
+                }
+            }
+        });
+
+        newGameBtn.addEventListener('click', initGame);
+        pauseBtn.addEventListener('click', () => {
+            gamePaused = !gamePaused;
+            pauseBtn.textContent = gamePaused ? '继续' : '暂停';
+        });
+        restartBtn.addEventListener('click', () => {
+            gameOverElement.classList.add('hidden');
+            initGame();
+        });
+
+        // 初始化游戏
+        initGame();
+    </script>
+</body>
+</html>

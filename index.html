@@ -391,7 +391,7 @@
                 thumbnail: '🚀',
                 rating: 4.4,
                 plays: 7300,
-                description: '射击外星侵略者，保卫地球！'
+                description: '飞机大战！驾驶你的飞船，击败外星入侵者！'
             }
         ];
 
@@ -509,6 +509,12 @@
                 gameContent.innerHTML = `
                     <div style="display: flex; justify-content: center; padding: 20px;">
                         <iframe src="memory.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'space-invaders') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="space-invaders.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
                     </div>
                 `;
             } else {
