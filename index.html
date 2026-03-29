@@ -493,6 +493,30 @@
                         <iframe src="flappybird.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
                     </div>
                 `;
+            } else if (gameId === '2048') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="2048.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'mario') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="mario.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'sudoku') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="sudoku.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
+            } else if (gameId === 'pacman') {
+                gameContent.innerHTML = `
+                    <div style="display: flex; justify-content: center; padding: 20px;">
+                        <iframe src="pacman.html" width="800" height="600" style="border: none; border-radius: 8px;"></iframe>
+                    </div>
+                `;
             } else {
                 gameContent.innerHTML = `
                     <div style="text-align: center; padding: 60px;">
