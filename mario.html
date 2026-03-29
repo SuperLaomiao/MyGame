@@ -55,7 +55,7 @@
             width: 30px;
             height: 40px;
             background-color: #FF6B6B;
-            bottom: 0;
+            bottom: 20px;
             left: 50px;
             border-radius: 5px 5px 0 0;
             z-index: 10;
@@ -221,10 +221,10 @@
         let enemies = [];
         let playerState = {
             x: 50,
-            y: 0,
+            y: 20,
             velocityX: 0,
             velocityY: 0,
-            onGround: false
+            onGround: true
         };
 
         // 初始化游戏
@@ -245,10 +245,10 @@
             // 重置玩家位置
             playerState = {
                 x: 50,
-                y: 0,
+                y: 20,
                 velocityX: 0,
                 velocityY: 0,
-                onGround: false
+                onGround: true
             };
             
             // 创建平台
@@ -522,10 +522,10 @@
             } else {
                 // 重置位置
                 playerState.x = 50;
-                playerState.y = 0;
+                playerState.y = 20;
                 playerState.velocityX = 0;
                 playerState.velocityY = 0;
-                playerState.onGround = false;
+                playerState.onGround = true;
                 
                 // 重置敌人位置
                 enemies.forEach((enemy, index) => {
