@@ -136,7 +136,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            transform-style: preserve-3d;
         }
 
         .card:hover {
@@ -145,7 +145,6 @@
         }
 
         .card.flipped {
-            background-color: #fff;
             transform: rotateY(180deg);
         }
 
@@ -167,13 +166,11 @@
 
         .card-back {
             background-color: #2196f3;
-            color: #2196f3;
             border-radius: 8px;
         }
 
         .card-front {
             background-color: #fff;
-            color: #333;
             transform: rotateY(180deg);
         }
 

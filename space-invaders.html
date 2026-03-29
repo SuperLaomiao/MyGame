@@ -97,8 +97,8 @@
 
         .game-board {
             position: relative;
-            width: 800px;
-            height: 600px;
+            width: 90vw;
+            height: 70vh;
             background-color: rgba(0, 0, 0, 0.9);
             border-radius: 8px;
             overflow: hidden;
@@ -148,15 +148,16 @@
             background-color: #00ffff;
             border-radius: 50%;
             bottom: 20px;
-            left: 380px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 10;
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
             animation: playerIdle 0.5s infinite alternate;
         }
 
         @keyframes playerIdle {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-5px); }
+            0% { transform: translateX(-50%) translateY(0); }
+            100% { transform: translateX(-50%) translateY(-5px); }
         }
 
         .enemy {
@@ -242,7 +243,8 @@
             .player {
                 width: 30px;
                 height: 30px;
-                left: 135px;
+                left: 50%;
+                transform: translateX(-50%);
             }
             
             .enemy {
@@ -296,8 +298,8 @@
 
     <script>
         // 太空侵略者游戏实现
-        const GAME_WIDTH = 800;
-        const GAME_HEIGHT = 600;
+        const GAME_WIDTH = 90; // 百分比
+        const GAME_HEIGHT = 70; // 百分比
         const PLAYER_SPEED = 5;
         const ENEMY_SPEED = 2;
         const BULLET_SPEED = 10;
@@ -305,7 +307,7 @@
         const ENEMY_SPAWN_INTERVAL = 1000;
         const PLAYER_BULLET_DAMAGE = 1;
 
-        let player = { x: 380, y: 540, width: 40, height: 40, speed: PLAYER_SPEED, lastShot: 0 };
+        let player = { x: 50, y: 100, width: 40, height: 40, speed: PLAYER_SPEED, lastShot: 0 }; // 位置为百分比
         let enemies = [];
         let bullets = [];
         let enemyBullets = [];
@@ -346,8 +348,8 @@
             gamePaused = false;
             
             // 重置玩家位置
-            player.x = 380;
-            player.y = 540;
+            player.x = 50;
+            player.y = 100;
             
             // 更新 UI
             scoreElement.textContent = score;
@@ -372,8 +374,8 @@
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                star.style.left = `${Math.random() * GAME_WIDTH}px`;
-                star.style.top = `${Math.random() * GAME_HEIGHT}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
                 star.style.animationDuration = `${Math.random() * 2 + 1}s`;
                 starsElement.appendChild(star);
             }
@@ -384,8 +386,8 @@
             if (gameOver || gamePaused) return;
             
             const enemy = {
-                x: Math.random() * (GAME_WIDTH - 30),
-                y: -30,
+                x: Math.random() * (100 - 5),
+                y: -5,
                 width: 30,
                 height: 30,
                 speed: ENEMY_SPEED,
@@ -394,8 +396,8 @@
             
             const enemyElement = document.createElement('div');
             enemyElement.className = 'enemy';
-            enemyElement.style.left = `${enemy.x}px`;
-            enemyElement.style.top = `${enemy.y}px`;
+            enemyElement.style.left = `${enemy.x}%`;
+            enemyElement.style.top = `${enemy.y}%`;
             gameBoardElement.appendChild(enemyElement);
             
             enemy.element = enemyElement;
@@ -419,10 +421,10 @@
         function update() {
             // 更新敌人
             enemies.forEach((enemy, index) => {
-                enemy.y += enemy.speed;
-                
+                enemy.y += enemy.speed * 0.5; // 调整速度
+            
                 // 检查是否到达底部
-                if (enemy.y > GAME_HEIGHT) {
+                if (enemy.y > 100) {
                     enemy.element.remove();
                     enemies.splice(index, 1);
                     // 减少生命
@@ -436,33 +438,33 @@
                         showGameOver('很遗憾，你被敌机击中了！');
                     }
                 } else {
-                    enemy.element.style.top = `${enemy.y}px`;
+                    enemy.element.style.top = `${enemy.y}%`;
                 }
             });
             
             // 更新子弹
             bullets.forEach((bullet, index) => {
-                bullet.y -= BULLET_SPEED;
+                bullet.y -= BULLET_SPEED * 0.5;
                 
                 // 检查是否到达顶部
                 if (bullet.y < 0) {
                     bullet.element.remove();
                     bullets.splice(index, 1);
                 } else {
-                    bullet.element.style.top = `${bullet.y}px`;
+                    bullet.element.style.top = `${bullet.y}%`;
                 }
             });
             
             // 更新敌机子弹
             enemyBullets.forEach((bullet, index) => {
-                bullet.y += BULLET_SPEED;
+                bullet.y += BULLET_SPEED * 0.5;
                 
                 // 检查是否到达底部
-                if (bullet.y > GAME_HEIGHT) {
+                if (bullet.y > 100) {
                     bullet.element.remove();
                     enemyBullets.splice(index, 1);
                 } else {
-                    bullet.element.style.top = `${bullet.y}px`;
+                    bullet.element.style.top = `${bullet.y}%`;
                 }
             });
             
@@ -480,16 +482,16 @@
         // 敌机射击
         function enemyShoot(enemy) {
             const bullet = {
-                x: enemy.x + enemy.width / 2 - 2,
-                y: enemy.y + enemy.height,
+                x: enemy.x + enemy.width / 90,
+                y: enemy.y + enemy.height / 70,
                 width: 4,
                 height: 15
             };
             
             const bulletElement = document.createElement('div');
             bulletElement.className = 'bullet';
-            bulletElement.style.left = `${bullet.x}px`;
-            bulletElement.style.top = `${bullet.y}px`;
+            bulletElement.style.left = `${bullet.x}%`;
+            bulletElement.style.top = `${bullet.y}%`;
             gameBoardElement.appendChild(bulletElement);
             
             bullet.element = bulletElement;
@@ -501,11 +503,21 @@
             // 玩家子弹击中敌人
             bullets.forEach((bullet, bulletIndex) => {
                 enemies.forEach((enemy, enemyIndex) => {
+                    const bulletLeft = bullet.x;
+                    const bulletRight = bullet.x + bullet.width / 90;
+                    const bulletTop = bullet.y;
+                    const bulletBottom = bullet.y + bullet.height / 70;
+                    
+                    const enemyLeft = enemy.x;
+                    const enemyRight = enemy.x + enemy.width / 90;
+                    const enemyTop = enemy.y;
+                    const enemyBottom = enemy.y + enemy.height / 70;
+                    
                     if (
-                        bullet.x < enemy.x + enemy.width &&
-                        bullet.x + bullet.width > enemy.x &&
-                        bullet.y < enemy.y + enemy.height &&
-                        bullet.y + bullet.height > enemy.y
+                        bulletLeft < enemyRight &&
+                        bulletRight > enemyLeft &&
+                        bulletTop < enemyBottom &&
+                        bulletBottom > enemyTop
                     ) {
                         // 击中敌人
                         bullet.element.remove();
@@ -522,11 +534,21 @@
             
             // 敌机子弹击中玩家
             enemyBullets.forEach((bullet, index) => {
+                const bulletLeft = bullet.x;
+                const bulletRight = bullet.x + bullet.width / 90;
+                const bulletTop = bullet.y;
+                const bulletBottom = bullet.y + bullet.height / 70;
+                
+                const playerLeft = player.x - player.width / (2 * 90);
+                const playerRight = player.x + player.width / (2 * 90);
+                const playerTop = player.y - player.height / (2 * 70);
+                const playerBottom = player.y + player.height / (2 * 70);
+                
                 if (
-                    bullet.x < player.x + player.width &&
-                    bullet.x + bullet.width > player.x &&
-                    bullet.y < player.y + player.height &&
-                    bullet.y + bullet.height > player.y
+                    bulletLeft < playerRight &&
+                    bulletRight > playerLeft &&
+                    bulletTop < playerBottom &&
+                    bulletBottom > playerTop
                 ) {
                     bullet.element.remove();
                     enemyBullets.splice(index, 1);
@@ -545,11 +567,21 @@
             
             // 敌机碰撞玩家
             enemies.forEach((enemy, index) => {
+                const enemyLeft = enemy.x;
+                const enemyRight = enemy.x + enemy.width / 90;
+                const enemyTop = enemy.y;
+                const enemyBottom = enemy.y + enemy.height / 70;
+                
+                const playerLeft = player.x - player.width / (2 * 90);
+                const playerRight = player.x + player.width / (2 * 90);
+                const playerTop = player.y - player.height / (2 * 70);
+                const playerBottom = player.y + player.height / (2 * 70);
+                
                 if (
-                    enemy.x < player.x + player.width &&
-                    enemy.x + enemy.width > player.x &&
-                    enemy.y < player.y + player.height &&
-                    enemy.y + enemy.height > player.y
+                    enemyLeft < playerRight &&
+                    enemyRight > playerLeft &&
+                    enemyTop < playerBottom &&
+                    enemyBottom > playerTop
                 ) {
                     enemy.element.remove();
                     enemies.splice(index, 1);
@@ -570,8 +602,8 @@
         // 绘制游戏元素
         function draw() {
             // 绘制玩家
-            playerElement.style.left = `${player.x}px`;
-            playerElement.style.top = `${player.y}px`;
+            playerElement.style.left = `${player.x}%`;
+            playerElement.style.top = `${player.y}%`;
         }
 
         // 显示游戏结束信息
@@ -591,16 +623,16 @@
             }
             
             const bullet = {
-                x: player.x + player.width / 2 - 2,
-                y: player.y,
+                x: player.x,
+                y: player.y - player.height / (2 * 70),
                 width: 4,
                 height: 15
             };
             
             const bulletElement = document.createElement('div');
             bulletElement.className = 'bullet';
-            bulletElement.style.left = `${bullet.x}px`;
-            bulletElement.style.top = `${bullet.y}px`;
+            bulletElement.style.left = `${bullet.x}%`;
+            bulletElement.style.top = `${bullet.y}%`;
             gameBoardElement.appendChild(bulletElement);
             
             bullet.element = bulletElement;
@@ -612,9 +644,9 @@
         // 移动玩家
         function movePlayer(direction) {
             if (direction === 'left') {
-                player.x = Math.max(0, player.x - player.speed);
+                player.x = Math.max(0, player.x - player.speed * 0.5);
             } else if (direction === 'right') {
-                player.x = Math.min(GAME_WIDTH - player.width, player.x + player.speed);
+                player.x = Math.min(100, player.x + player.speed * 0.5);
             }
         }
 
