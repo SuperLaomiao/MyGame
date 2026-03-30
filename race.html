@@ -8,222 +8,389 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2768422999984116"
         crossorigin="anonymous"></script>
     <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 根变量定义 */
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --accent-color: #ffff00;
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-color: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
         body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 50%, var(--bg-color) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            color: #333;
-            font-family: Arial, sans-serif;
-            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
 
+        /* 背景动画 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundPulse 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundPulse {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+
+        /* 游戏容器 */
         .game-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+            max-width: 1000px;
+            width: 100%;
+            margin: 20px;
         }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
+        /* 游戏标题 */
         .game-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
         }
 
-        .game-stats {
-            display: flex;
-            gap: 20px;
-            align-items: center;
+        @keyframes titleGlow {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.3); }
         }
 
-        .score, .lives, .speed {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .score-value, .lives-value, .speed-value {
-            font-size: 24px;
-            color: #ff0000;
-        }
-
+        /* 游戏控制区域 */
         .game-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
         }
 
         .game-buttons {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            padding: 8px 16px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--bg-color);
             border: none;
-            border-radius: 5px;
-            background-color: #2196f3;
-            color: #fff;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
+            font-weight: 700;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.4);
         }
 
         .btn:hover {
-            background-color: #1976d2;
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
         }
 
-        .game-board {
-            background-color: #006600;
-            border-radius: 8px;
+        /* 游戏信息 */
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            width: 600px;
-            height: 400px;
-            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* 游戏板 */
+        .game-board {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+            height: 600px;
+            margin-bottom: 30px;
+        }
+
+        /* 道路 */
         .road {
             position: absolute;
             width: 400px;
             height: 100%;
-            left: 100px;
-            background-color: #333;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #333 0%, #555 50%, #333 100%);
             overflow: hidden;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         .lane {
             position: absolute;
             width: 133px;
             height: 100%;
-            border-right: 2px dashed #fff;
+            border-right: 2px dashed rgba(255, 255, 255, 0.6);
             top: 0;
+            animation: laneMove 0.5s linear infinite;
         }
 
+        @keyframes laneMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(20px); }
+        }
+
+        /* 玩家汽车 */
         .player-car {
             position: absolute;
             width: 40px;
             height: 60px;
-            background-color: #ff0000;
-            border-radius: 3px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--border-radius);
             bottom: 20px;
-            left: 130px;
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 10;
         }
 
+        .player-car:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 6px 25px rgba(0, 255, 255, 0.6);
+        }
+
+        /* 敌人汽车 */
         .enemy-car {
             position: absolute;
             width: 40px;
             height: 60px;
-            border-radius: 3px;
+            border-radius: var(--border-radius);
             top: -60px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 5;
         }
 
+        .enemy-car:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(255, 0, 255, 0.6);
+        }
+
+        /* 游戏结束界面 */
         .game-over {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 50px rgba(0, 0, 255, 0.5);
+            border: 1px solid rgba(0, 255, 255, 0.3);
             z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .game-over h2 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #ff0000;
-        }
-
-        .game-over p {
-            margin-bottom: 20px;
-            font-size: 18px;
-        }
-
-        .hidden {
+            text-align: center;
             display: none;
         }
 
+        .game-over.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .game-over h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            margin-bottom: 20px;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        .game-over p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        /* 响应式设计 */
         @media (max-width: 768px) {
-            .game-header,
-            .game-controls,
             .game-board {
-                width: 100%;
-                max-width: 300px;
-                margin: 0 auto;
+                height: 400px;
             }
-            
-            .game-board {
-                height: 300px;
+
+            .player-car {
+                width: 30px;
+                height: 50px;
+                font-size: 1.5rem;
             }
-            
-            .road {
-                width: 240px;
-                left: 30px;
-            }
-            
-            .lane {
-                width: 80px;
-            }
-            
-            .player-car,
+
             .enemy-car {
                 width: 30px;
-                height: 45px;
+                height: 50px;
+                font-size: 1rem;
             }
-            
-            .player-car {
-                left: 75px;
+
+            .game-title {
+                font-size: 2rem;
             }
+
+            .game-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-color);
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <div class="game-header">
-            <h1 class="game-title">赛车游戏</h1>
-            <div class="game-stats">
-                <div class="score">
-                    <div>得分</div>
-                    <div class="score-value" id="score">0</div>
-                </div>
-                <div class="lives">
-                    <div>生命</div>
-                    <div class="lives-value" id="lives">3</div>
-                </div>
-                <div class="speed">
-                    <div>速度</div>
-                    <div class="speed-value" id="speed">0</div>
-                </div>
-            </div>
-        </div>
-
+        <button class="back-btn" onclick="window.location.href='index.html'">← 回到主页</button>
+        <h1 class="game-title">🏎️ 赛车游戏</h1>
+        
         <div class="game-controls">
             <div class="game-buttons">
                 <button class="btn" id="newGameBtn">新游戏</button>
                 <button class="btn" id="pauseBtn">暂停</button>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div class="info-item">
+                <span class="info-label">得分</span>
+                <span class="info-value" id="score">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">生命</span>
+                <span class="info-value" id="lives">3</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">速度</span>
+                <span class="info-value" id="speed">0</span>
             </div>
         </div>
 
@@ -232,13 +399,13 @@
                 <div class="lane" style="left: 0;"></div>
                 <div class="lane" style="left: 133px;"></div>
                 <div class="lane" style="left: 266px;"></div>
-                <div class="player-car" id="playerCar"></div>
+                <div class="player-car" id="playerCar">🚗</div>
             </div>
         </div>
 
-        <div class="game-over hidden" id="gameOver">
-            <h2>游戏结束!</h2>
-            <p>很遗憾，你发生了碰撞！</p>
+        <div class="game-over" id="gameOver">
+            <h2 id="gameOverTitle">游戏结束!</h2>
+            <p id="gameOverMessage">很遗憾，你发生了碰撞！</p>
             <p>得分: <span id="finalScore">0</span></p>
             <p>最高速度: <span id="finalSpeed">0</span>km/h</p>
             <button class="btn" id="restartBtn">再玩一次</button>
@@ -299,7 +466,7 @@
             livesElement.textContent = lives;
             speedElement.textContent = speed;
             finalSpeedElement.textContent = maxSpeed;
-            gameOverElement.classList.add('hidden');
+            gameOverElement.classList.remove('active');
             
             // 开始游戏循环
             startGameLoop();
@@ -392,6 +559,7 @@
                 enemyElement.style.width = car.width + 'px';
                 enemyElement.style.height = car.height + 'px';
                 enemyElement.style.backgroundColor = car.color;
+                enemyElement.textContent = '🚙';
                 roadElement.appendChild(enemyElement);
             });
         }
@@ -455,7 +623,7 @@
         // 显示游戏结束信息
         function showGameOver() {
             finalScoreElement.textContent = score;
-            gameOverElement.classList.remove('hidden');
+            gameOverElement.classList.add('active');
         }
 
         // 事件监听器
@@ -473,7 +641,7 @@
             pauseBtn.textContent = gamePaused ? '继续' : '暂停';
         });
         restartBtn.addEventListener('click', () => {
-            gameOverElement.classList.add('hidden');
+            gameOverElement.classList.remove('active');
             initGame();
         });
 
